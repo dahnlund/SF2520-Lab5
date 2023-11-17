@@ -1,6 +1,6 @@
 
 n =40;
-d = 2;
+d = 3;
 N = n^d;
 
 b = rand(N,1);
@@ -37,37 +37,22 @@ fprintf("Linear solver time: %.04f seconds\n", dt2)
 
 %% Conjugate method
 
-n =100;
-d = 3;
-N = n^d;
-
-b = rand(N,1);
-
 x = zeros(N,1);
-K = 1000;
-
-A = lap(n,d);
-
-M = spdiags(diag(A),0,N,N); T = M-A;
-
-
 p = x;
 r = b;
-TOL = 1e-8;
+b0 = 0;
+
+
 for i = 0:K
     if i == 0
-        beta = 0;
+        b_new = 0;
     else
-        beta = r'*r/(r_old'*r_old);
+        b_new = r_new'*r_new/(r'*r);
     end
-    p = r + beta*p;
+    p = r + b_new*p;
     a = p'*r/(p'*A*p);
-    
+
     x = x+a*p;
-    r_old = r;
-    r = r - a*A*p;
-    if norm(A*x-b)/norm(b) < TOL
-        break
-    end
+    r_new = r_new - a*A*p;
 end
 

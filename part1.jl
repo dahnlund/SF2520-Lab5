@@ -12,13 +12,13 @@ A = read(mat)["A"]
 close(mat)
 """
 
-n = 70
-d = 3
+n = 100
+d = 2
 N = n^d
 
 b = sprand(N,1.0,rand,Float32)
 
-K = 1000
+K = 10000
 
 A = lap(n,d)
 
