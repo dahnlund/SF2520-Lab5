@@ -12,21 +12,42 @@ A = read(mat)["A"]
 close(mat)
 """
 
-n = 10
-d = 1
+n = 70
+d = 3
+N = n^d
 
-b = rand(n,1)
+b = sprand(N,1.0,rand,Float32)
 
-K = 100
+K = 1000
 
 A = lap(n,d)
 
 M = spdiagm(diag(A)); T = M-A;
 
-x = spzeros(n)
-for _ in 1:K
+x = spzeros(N)
+stored_errors = zeros(K);
+TOL = 0.01
+t = time()
+for i in 1:K
     global x
+    global rel_err
     x = M\(T*x+b);
+    rel_err = norm(A*x-b)/norm(b)
+    stored_errors[i] = rel_err
+    if rel_err <= TOL
+        println("Finished at $i iterations")
+        break
+    end
 end
+dt1 = time()-t;
 
-println(norm(x-A\b))
+println("Iterative time: $dt1 seconds, relative error: $rel_err")
+plot(1:K, stored_errors, yscale=:log10)
+
+
+t = time()
+x1 = A\Vector(b)
+dt2 = time()-t
+
+
+println("Linear solver time: $dt2 seconds")
