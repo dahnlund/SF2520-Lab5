@@ -27,12 +27,13 @@ end
 #Jacobi Method
 function jacobi(A, b, K, TOL)
     M = spdiagm(diag(A)); T = M-A;
-    stored_errors = zeros(K);
-    x = spzeros(length(A[:,1]))
+    stored_errors = zeros(Float64,K);
+    x = spzeros(Float64,length(A[:,1]))
     norm_b = norm(b)
     t = time()
     for i in 1:K
         x .= M\(T*x+b);
+        #x .= diag(M).^(-1).*(T*x+b)
         rel_err = norm(A*x-b)/norm_b
         stored_errors[i] = rel_err
         if rel_err <= TOL
@@ -43,7 +44,7 @@ function jacobi(A, b, K, TOL)
     dt1 = time()-t;
 
     println("Computation time Jacobi: $dt1 seconds")
-    return x, stored_errors
+    return x, stored_errors[stored_errors .!=0]
 end
 
 #Conjugate method
@@ -77,5 +78,5 @@ function cgm(A, b, K, TOL)
     end
     dt = time() - t;
     println("Computation time cgm: $dt seconds")
-    return x, stored_errors
+    return x, stored_errors[stored_errors .!= 0]
 end
