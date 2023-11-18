@@ -29,11 +29,11 @@ function jacobi(A, b, K, TOL)
     M = spdiagm(diag(A)); T = M-A;
     stored_errors = zeros(K);
     x = spzeros(length(A[:,1]))
+    norm_b = norm(b)
     t = time()
     for i in 1:K
-        
         x .= M\(T*x+b);
-        rel_err = norm(A*x-b)/norm(b)
+        rel_err = norm(A*x-b)/norm_b
         stored_errors[i] = rel_err
         if rel_err <= TOL
             println("Finished at $i iterations")
@@ -49,6 +49,7 @@ end
 #Conjugate method
 function cgm(A, b, K, TOL)
     x = spzeros(length(A[:,1]))
+    norm_b = norm(b)
     p = copy(x)
     stored_errors = zeros(K);
     r = copy(b)
@@ -67,7 +68,7 @@ function cgm(A, b, K, TOL)
         r_old .= r
         r .= r .- a .* (A * p)
 
-        rel_err = norm(A * x - b) / norm(b)
+        rel_err = norm(A * x - b) / norm_b
         stored_errors[i+1] = rel_err
         if  rel_err < TOL
             println("Finished at $i iterations")

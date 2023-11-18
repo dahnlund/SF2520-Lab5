@@ -12,14 +12,13 @@ A = read(mat)["A"]
 close(mat)
 """
 
-n = 20
+n = 60
 d = 3
 N = n^d
+K = 1000
+TOL = 1e-5
 
-b = sprand(N,1.0,rand,Float32)
-
-K = 10000
-TOL = 1e-3
+b = sprand(N,1.0,rand,Float64)
 
 A = lap(n,d)
 
@@ -31,11 +30,7 @@ x1 = A\Vector(b)
 dt2 = time()-t
 println("Linear solver time: $dt2 seconds")
 
-
-
-K = 10000
-TOL = 1e-3
-
+TOL = 1e-5
 x_conj, SE2 = cgm(A, b, K, TOL);
 
 err_j = norm(A*x-b)/norm(b)
