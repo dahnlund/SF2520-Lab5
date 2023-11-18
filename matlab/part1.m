@@ -1,6 +1,6 @@
 
 n =40;
-d = 3;
+d = 2;
 N = n^d;
 
 b = rand(N,1);
@@ -26,7 +26,7 @@ for i = 1:K
 end
 dt1 = toc();
 fprintf("Iterative time: %.04f seconds, relative error: %.04f: \n", dt1,rel_err)
-semilogy(1:length(stored_errors), stored_errors)
+semilogy(1:i, stored_errors(1:i))
 
 
 tic();
@@ -37,22 +37,37 @@ fprintf("Linear solver time: %.04f seconds\n", dt2)
 
 %% Conjugate method
 
+n =100;
+d = 3;
+N = n^d;
+
+b = rand(N,1);
+
 x = zeros(N,1);
+K = 1000;
+
+A = lap(n,d);
+
+M = spdiags(diag(A),0,N,N); T = M-A;
+
+
 p = x;
 r = b;
-b0 = 0;
-
-
+TOL = 1e-8;
 for i = 0:K
     if i == 0
-        b_new = 0;
+        beta = 0;
     else
-        b_new = r_new'*r_new/(r'*r);
+        beta = r'*r/(r_old'*r_old);
     end
-    p = r + b_new*p;
+    p = r + beta*p;
     a = p'*r/(p'*A*p);
-
+    
     x = x+a*p;
-    r_new = r_new - a*A*p;
+    r_old = r;
+    r = r - a*A*p;
+    if norm(A*x-b)/norm(b) < TOL
+        break
+    end
 end
 
