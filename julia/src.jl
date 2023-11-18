@@ -47,7 +47,7 @@ function jacobi(A, b, K, TOL)
     return x, stored_errors[stored_errors .!=0]
 end
 
-#Conjugate method
+#Conjugate method.
 function cgm(A, b, K, TOL)
     x = spzeros(length(A[:,1]))
     norm_b = norm(b)
