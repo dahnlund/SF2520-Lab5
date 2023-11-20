@@ -1,19 +1,8 @@
 using LinearAlgebra
 using SparseArrays
-#using MAT
 using Plots
-using IterativeSolvers
-using IncompleteLU
-
 include("src.jl")
 
-#t = time() dt = time() - t
-
-"""
-mat = matopen("SF2520/SF2520-Lab5/convdiff.mat")
-A = read(mat)["A"]
-close(mat)
-"""
 
 n = 10
 d = 4
@@ -48,11 +37,3 @@ plot!(SE2, label="Conjugate descent convergence", yscale=:log10)
 xlabel!("iteration")
 ylabel!("L_2 norm, relative error")
 display(plot1)
-
-P = ilu(A, τ = 0.1);
-x3 = bicgstabl(A,b,2, Pl = P, max_mv_products = 2000)
-x4 = cg(A,b)
-
-
-println(norm(A*x3-b)/norm(b))
-println(norm(A*x4-b)/norm(b))
