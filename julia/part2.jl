@@ -6,8 +6,7 @@ using IterativeSolvers
 using IncompleteLU
 
 "Part 2c"
-
-mat = matopen("data/convdiff.mat")
+mat = matopen("data/cooling_flange.mat")
 #mat = matopen("data/cooling_flange.mat")
 A = read(mat)["A"]
 close(mat)
@@ -27,7 +26,7 @@ println("Computation time Linear Solver: $time_ls. RELRES: $err_ls")
 # GMRES
 LU = ilu(A, τ = 0.1)
 t = time()
-x_gm = bicgstabl(A,b, Pl = LU)
+x_gm, RESVEC = bicgstabl(A,b, restart = 1, Pl = LU, log = true)
 time_gm = time()-t
 
 err_gm = norm(A*x_gm-b)/norm(b)

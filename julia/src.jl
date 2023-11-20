@@ -40,10 +40,14 @@ function jacobi(A, b, K, TOL)
             println("Finished at $i iterations")
             break
         end
+        if i == K
+            println("Did not converge before maxit")
+        end
     end
     dt1 = time()-t;
 
     println("Computation time Jacobi: $dt1 seconds")
+
     return x, stored_errors[stored_errors .!=0]
 end
 
@@ -64,10 +68,11 @@ function cgm(A, b, K, TOL)
         end
 
         p .= r .+ beta .* p
-        a = dot(p, r) / dot(p, A * p)
+        Ap = A*p;
+        a = dot(p, r) / dot(p, Ap)
         x .= x .+ a .* p
         r_old .= r
-        r .= r .- a .* (A * p)
+        r .= r .- a .* (Ap)
 
         rel_err = norm(A * x - b) / norm_b
         stored_errors[i+1] = rel_err

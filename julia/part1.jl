@@ -4,36 +4,49 @@ using Plots
 include("src.jl")
 
 
-n = 10
-d = 4
-N = n^d
-K = 1000
-TOL = 1e-8
-
-b = sprand(N,1.0,rand,Float64)
-
-A = lap(n,d)
-
-x, SE1 = jacobi(A,b,K,TOL);
 
 
-t = time()
-x1 = A\Vector(b)
-dt2 = time()-t
-println("Linear solver time: $dt2 seconds")
+function analysis(method, K, n_list, d_list, TOL = 1e-8, linearcomp = false)
 
-TOL = 1e-8
-x_conj, SE2 = cgm(A, b, K, TOL);
+# method:: Int: 1=Jacobi, 2=CG
+# K:: Int: max_iterations
+# n:: Vector: discretization resolution
+# d:: Vector: dimension
 
-err_j = norm(A*x-b)/norm(b)
-println("\nRelative error Jacobi: $err_j")
-err_cgm = norm(A*x_conj-b)/norm(b)
-println("\nRelative error conjugate descent: $err_cgm")
-err_ls = norm(A*x1-b)/norm(b)
-println("\nRelative error Linear Solver: $err_ls")
+# For clear example where iterative methods are superior: n = 15, d = 4
+# Also, when excluding Jacobi, one can run n = 40, d = 3
+plot1 = plot()
+for n in n_list
+    for d in d_list
+        N = n^d
+        b = sprand(N,1.0,rand,Float64)
+        A = lap(n,d)
 
-plot1 = plot(SE1, label="Jacobi convergence", yscale=:log10)
-plot!(SE2, label="Conjugate descent convergence", yscale=:log10)
-xlabel!("iteration")
-ylabel!("L_2 norm, relative error")
+        if method == 1
+            println("\nn = $n, d = $d. Computing using Jacobi...")
+            x, SE = jacobi(A,b,K,TOL);
+        end
+        if method == 2
+            println("\nn = $n, d = $d. Computing using Conjugate gradient...")
+            x, SE = cgm(A, b, K, TOL);
+        end
+
+        err = norm(A*x-b)/norm(b)
+        println("Relative error: $err")
+
+        plot!(SE, yscale=:log10, label = "n = $n, d = $d")
+        xlabel!("iteration")
+        ylabel!("L_2 norm, relative error")
+
+        if linearcomp == true
+            println("\nn = $n, d = $d. Computing using Linear Solver...")
+            t = time()
+            A\Vector(b);
+            dt2 = time()-t
+            println("Computation time LS: $dt2 seconds")
+        end
+
+    end
+end
 display(plot1)
+end
