@@ -60,12 +60,11 @@ mat = load('../data/x_gm.mat');
 x_gm = mat.("x_gm")';
 disp(norm(A*x_gm-b)/norm(b))
 
-%[L, U] = ilu(A);
-%L,U] = ilu(A,struct('type','ilutp','droptol',1e-6));
-%tic()
-%[x_gm,FLAG,RELRES,ITER,RESVEC_gm] = gmres(A, b, false, 1e-4, 10000, L, U);
-%time_gm = toc();
-%fprintf("\nGMRES::     Computation time: %.04f seconds. RELRES: %.05d, Iterations: %.0f, Flag: %.0f\n",time_gm, RELRES, ITER, FLAG)
+M = ilu(A);
+tic()
+[x_gm,FLAG,RELRES,ITER,RESVEC_gm] = gmres(A, b, false, 1e-4, 10000, M);
+time_gm = toc();
+fprintf("\nGMRES::     Computation time: %.04f seconds. RELRES: %.05d, Iterations: %.0f, Flag: %.0f\n",time_gm, RELRES, ITER, FLAG)
 
 
 
