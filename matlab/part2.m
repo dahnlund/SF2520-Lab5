@@ -41,7 +41,7 @@ fprintf("pcg M=diag::      Computation time: %.04f seconds. RELRES: %.05d, Itera
 
 
 %% Compare convergence
-plot(RESVEC_cg);hold on; plot(RESVEC_pcgd); plot(RESVEC_pcgc)
+semilogy(RESVEC_cg);hold on; semilogy(RESVEC_pcgd); semilogy(RESVEC_pcgc)
 xlabel("Iterations")
 ylabel("RELRES")
 legend("PCG", "PCG (diag)", "PCG (ichol)")
