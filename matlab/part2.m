@@ -54,17 +54,22 @@ A = mat.("A");
 N = length(A(:,1));
 b = rand(N,1);
 
-mat = load('../data/b.mat');
-b = mat.("b")';
-mat = load('../data/x_gm.mat');
-x_gm = mat.("x_gm")';
-disp(norm(A*x_gm-b)/norm(b))
+%% Solve with GE
+tic
+x_gmls = A\b;
+time_gmls = toc();
+
+err_gmls = norm(A*x_gmls-b)/norm(b);
+fprintf("Linear Solver::      Computation time: %.04f seconds. RELRES: %.05d\n", time_gmls, err_gmls)
+
+%% Using GMRES
 
 M = ilu(A);
 tic()
-[x_gm,FLAG,RELRES,ITER,RESVEC_gm] = gmres(A, b, false, 1e-4, 10000, M);
+[x_gm,FLAG,RELRES,ITER,RESVEC_gm] = gmres(A, b, false,1e-4, 1000, M);
 time_gm = toc();
 fprintf("\nGMRES::     Computation time: %.04f seconds. RELRES: %.05d, Iterations: %.0f, Flag: %.0f\n",time_gm, RELRES, ITER, FLAG)
+semilogy(RESVEC_gm)
 
 
 

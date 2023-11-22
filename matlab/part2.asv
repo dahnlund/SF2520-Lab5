@@ -41,7 +41,7 @@ fprintf("pcg M=diag::      Computation time: %.04f seconds. RELRES: %.05d, Itera
 
 
 %% Compare convergence
-plot(RESVEC_cg);hold on; plot(RESVEC_pcgd); plot(RESVEC_pcgc)
+semilogy(RESVEC_cg);hold on; semilogy(RESVEC_pcgd); semilogy(RESVEC_pcgc)
 xlabel("Iterations")
 ylabel("RELRES")
 legend("PCG", "PCG (diag)", "PCG (ichol)")
@@ -54,12 +54,23 @@ A = mat.("A");
 N = length(A(:,1));
 b = rand(N,1);
 
-[L, U] = ilu(A);
+%% Solve with GE
+tic
+x_gmls = A\b;
+time_gmls = toc();
+
+err_gmls = norm(A*x_gmls-b)/norm(b);
+fprintf("Linear Solver::      Computation time: %.04f seconds. RELRES: %.05d\n", time_gmls, err_gmls)
+
+%% Using 
+
+M = ilu(A);
 tic()
-[x_gm,FLAG,RELRES,ITER,RESVEC_gm] = gmres(A, b, 1e-1, 100, L, U);
+[x_gm,FLAG,RELRES,ITER,RESVEC_gm] = gmres(A, b, false, 1e-4, 10000, M);
 time_gm = toc();
-fprintf("GMRES::      Computation time: %.04f seconds. RELRES: %.05d, Iterations: %.0f, Flag: %.0f\n", ...
-    time_gmres, RELRES, ITER, FLAG)
+fprintf("\nGMRES::     Computation time: %.04f seconds. RELRES: %.05d, Iterations: %.0f, Flag: %.0f\n",time_gm, RELRES, ITER, FLAG)
+
+
 
 
 
