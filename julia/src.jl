@@ -88,16 +88,28 @@ function cgm(A, b, K, TOL)
 end
 
 
-function analysis(method, K, n_list, d_list, TOL = 1e-8, linearcomp = false)
+function analysis(method, K, n_list, d_list, TOL = 1e-8, linearcomp = false, existing_plot = false)
 
     # method:: Int: 1=Jacobi, 2=CG
+    if method == 1
+        tag = "J"
+    end
+    if method == 2
+        tag = "CG"
+    end
     # K:: Int: max_iterations
     # n:: Vector: discretization resolution
     # d:: Vector: dimension
     
     # For clear example where iterative methods are superior: n = 15, d = 4
     # Also, when excluding Jacobi, one can run n = 40, d = 3
-    plot1 = plot()
+
+    if existing_plot == false
+        plot1 = plot(size=(800,600))
+    else
+        plot1 = existing_plot
+    end
+
     for n in n_list
         for d in d_list
             N = n^d
@@ -116,7 +128,7 @@ function analysis(method, K, n_list, d_list, TOL = 1e-8, linearcomp = false)
             err = norm(A*x-b)/norm(b)
             println("Relative error: $err")
     
-            plot!(SE, yscale=:log10, label = "n = $n, d = $d")
+            plot!(SE, yscale=:log10, label = "$tag: n = $n, d = $d")
             xlabel!("iteration")
             ylabel!("L_2 norm, relative error")
     
@@ -130,5 +142,5 @@ function analysis(method, K, n_list, d_list, TOL = 1e-8, linearcomp = false)
     
         end
     end
-    display(plot1)
+    return plot1
     end
