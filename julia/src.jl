@@ -33,8 +33,7 @@ function jacobi(A, b, K, TOL)
     norm_b = norm(b)
     t = time()
     for i in 1:K
-        x .= M\(T*x+b);
-        #x .= diag(M).^(-1).*(T*x+b)
+        x .= diag(M).^(-1).*(T*x+b)
         rel_err = norm(A*x-b)/norm_b
         stored_errors[i] = rel_err
         if rel_err <= TOL
@@ -87,16 +86,8 @@ function cgm(A, b, K, TOL)
     return x, stored_errors[stored_errors .!= 0]
 end
 
+function analysis(method, K, n_list, d_list, comb = false, TOL = 1e-8, linearcomp = false, existing_plot = false)
 
-function analysis(method, K, n_list, d_list, TOL = 1e-8, linearcomp = false, existing_plot = false)
-
-    # method:: Int: 1=Jacobi, 2=CG
-    if method == 1
-        tag = "J"
-    end
-    if method == 2
-        tag = "CG"
-    end
     # K:: Int: max_iterations
     # n:: Vector: discretization resolution
     # d:: Vector: dimension
@@ -105,42 +96,65 @@ function analysis(method, K, n_list, d_list, TOL = 1e-8, linearcomp = false, exi
     # Also, when excluding Jacobi, one can run n = 40, d = 3
 
     if existing_plot == false
-        plot1 = plot(size=(800,600))
+        plt = plot(size=(800,600))
     else
-        plot1 = existing_plot
+        println("Adding to existing plot.")
+        plt = existing_plot
     end
-
-    for n in n_list
-        for d in d_list
-            N = n^d
-            b = sprand(N,1.0,rand,Float64)
-            A = lap(n,d)
     
-            if method == 1
-                println("\nn = $n, d = $d. Computing using Jacobi...")
-                x, SE = jacobi(A,b,K,TOL);
+    if comb == true
+        for n in n_list
+            for d in d_list
+                analysis_computation(method, K, n, d, TOL, linearcomp)
             end
-            if method == 2
-                println("\nn = $n, d = $d. Computing using Conjugate gradient...")
-                x, SE = cgm(A, b, K, TOL);
-            end
-    
-            err = norm(A*x-b)/norm(b)
-            println("Relative error: $err")
-    
-            plot!(SE, yscale=:log10, label = "$tag: n = $n, d = $d")
-            xlabel!("iteration")
-            ylabel!("L_2 norm, relative error")
-    
-            if linearcomp == true
-                println("\nn = $n, d = $d. Computing using Linear Solver...")
-                t = time()
-                A\Vector(b);
-                dt2 = time()-t
-                println("Computation time LS: $dt2 seconds")
-            end
-    
         end
     end
-    return plot1
+    if comb == false
+        for n in n_list
+            analysis_computation(method, K, n, d_list[n_list .== n][1], TOL, linearcomp)
+        end
     end
+    return plt
+end
+
+function analysis_computation(method, K, n, d, TOL, linearcomp)
+
+    # method:: Int: 1=Jacobi, 2=CG
+    if method == 1
+        tag = "J"
+    end
+    if method == 2
+        tag = "CG"
+    end
+
+    N = n^d
+    b = sprand(N,1.0,rand,Float64)
+    A = lap(n,d)
+
+    if method == 1
+        println("\nn = $n, d = $d. Computing using Jacobi...")
+        x, SE = jacobi(A,b,K,TOL);
+    end
+    if method == 2
+        println("\nn = $n, d = $d. Computing using Conjugate gradient...")
+        x, SE = cgm(A, b, K, TOL);
+    end
+
+    err = norm(A*x-b)/norm(b)
+    println("Relative error: $err")
+
+    plot!(SE, yscale=:log10, label = "$tag: n = $n, d = $d, N = $N")
+    xlabel!("iteration")
+    ylabel!("L_2 norm, relative error")
+
+    if linearcomp == true
+        println("\nn = $n, d = $d. Computing using Linear Solver...")
+        t = time()
+        A\Vector(b);
+        dt2 = time()-t
+        println("Computation time LS: $dt2 seconds")
+    end
+end
+
+
+
