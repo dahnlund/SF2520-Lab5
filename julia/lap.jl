@@ -22,4 +22,3 @@ function lap(n,d)
     return A
 end
 
-

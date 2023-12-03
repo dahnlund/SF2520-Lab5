@@ -28,8 +28,8 @@ end
 #Jacobi Method
 function jacobi(A, b, K, TOL)
     M = spdiagm(diag(A)); T = M-A;
-    stored_errors = zeros(Float64,K);
-    x = spzeros(Float64,length(A[:,1]))
+    stored_errors = zeros(K);
+    x = spzeros(length(b))
     norm_b = norm(b)
     t = time()
     for i in 1:K
@@ -78,6 +78,10 @@ function cgm(A, b, K, TOL)
         stored_errors[i+1] = rel_err
         if  rel_err < TOL
             println("Finished at $i iterations")
+            break
+        end
+        if i == length(x)
+            println("Number of iterations reached matrix size => Exits loop")
             break
         end
     end
