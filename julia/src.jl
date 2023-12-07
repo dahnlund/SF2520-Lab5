@@ -1,3 +1,5 @@
+#CE5 SE2520. Authors: David Ahnlund, Emil Gestsson
+
 using LinearAlgebra
 using SparseArrays
 using Plots
@@ -95,9 +97,6 @@ function analysis(method, K, n_list, d_list, comb = false, TOL = 1e-8, linearcom
     # K:: Int: max_iterations
     # n:: Vector: discretization resolution
     # d:: Vector: dimension
-    
-    # For clear example where iterative methods are superior: n = 15, d = 4
-    # Also, when excluding Jacobi, one can run n = 40, d = 3
 
     if existing_plot == false
         plt = plot(size=(800,600))
